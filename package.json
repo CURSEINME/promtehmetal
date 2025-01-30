@@ -1,0 +1,45 @@
+{
+	"name": "laser-cutting",
+	"version": "0.1.0",
+	"private": true,
+	"scripts": {
+		"dev": "next dev --turbopack",
+		"build": "next build",
+		"start": "next start",
+		"lint": "next lint",
+		"format": "prettier --write ."
+	},
+	"dependencies": {
+		"@aws-sdk/client-s3": "^3.735.0",
+		"@aws-sdk/s3-request-presigner": "^3.735.0",
+		"@next/bundle-analyzer": "^15.1.0",
+		"@pbe/react-yandex-maps": "^1.2.5",
+		"@prisma/client": "^6.2.1",
+		"clsx": "^2.1.1",
+		"next": "^15.1.5",
+		"react": "^18.0.0-rc-66855b96-20241106",
+		"react-dom": "^18.0.0-rc-66855b96-20241106",
+		"react-hook-form": "^7.53.2",
+		"react-icons": "^5.4.0",
+		"react-query": "^3.39.3",
+		"react-scroll": "^1.9.0",
+		"react-slick": "^0.30.2",
+		"slick-carousel": "^1.8.1"
+	},
+	"devDependencies": {
+		"@hookform/resolvers": "^3.9.1",
+		"@trivago/prettier-plugin-sort-imports": "^5.2.0",
+		"@types/node": "^20",
+		"@types/react": "^18",
+		"@types/react-dom": "^18",
+		"@types/react-scroll": "^1.8.10",
+		"@types/react-slick": "^0.23.13",
+		"postcss": "^8",
+		"prettier": "^3.4.2",
+		"prettier-plugin-organize-imports": "^4.1.0",
+		"prettier-plugin-tailwindcss": "^0.5.3",
+		"prisma": "^6.2.1",
+		"tailwindcss": "^3.3.2",
+		"typescript": "^5"
+	}
+}
