@@ -31,11 +31,11 @@ const Header = () => {
 					<ul className='flex items-center justify-end gap-20'>
 						<li className='flex items-center gap-5'>
 							<FaPhone className='h-5 w-5 text-[#ff1f1f]' />
-							<p className='text-md'>+7(952)446-62-33</p>
+							<p className='text-md'>+7 (952) 446-62-33</p>
 						</li>
 						<li className='flex items-center gap-5'>
 							<MdEmail className='h-6 w-6 text-[#ff1f1f]' />
-							<p className='text-red text-md'>sdlkfj@gmail.com</p>
+							<p className='text-red text-md'>info@promtehmetal.ru</p>
 						</li>
 						<li className='flex items-center gap-5'>
 							<FaLocationDot className='h-5 w-5 text-[#ff1f1f]' />

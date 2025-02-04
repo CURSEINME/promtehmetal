@@ -1,5 +1,6 @@
 'use client'
 
+import FlexLink from '@/components/FlexLink'
 import { Map, Placemark, YMaps } from '@pbe/react-yandex-maps'
 import Image from 'next/image'
 import { FaGear } from 'react-icons/fa6'
@@ -46,15 +47,15 @@ const SectionMap = () => {
 								</li>
 								<li>
 									<h3 className='mb-2 text-xl text-orange-400'>КОНТАКТЫ</h3>
-									<p className='text-lg'>+791012931289</p>
-									<p className='text-lg'>email@gmail.com</p>
+									<p className='text-lg'>+7 (952) 446-62-33</p>
+									<p className='text-lg'>info@promtehmetal.ru</p>
 								</li>
 							</ul>
 							<ul className='flex flex-col gap-2'>
 								<li>
 									<button className='flex w-[230px] items-center gap-2 rounded-2xl bg-white p-2 font-bold text-black'>
 										<MdEmail className='h-6 w-6' />
-										Написать на почту
+										<FlexLink to='feedback' offset={-200} className=''>Написать на почту</FlexLink>
 									</button>
 								</li>
 								<li>
@@ -65,7 +66,7 @@ const SectionMap = () => {
 											height={23}
 											alt='whatsapp'
 										/>
-										Написать в WhatsApp
+										+7 (952) 446-62-33
 									</button>
 								</li>
 								<li>
@@ -78,7 +79,7 @@ const SectionMap = () => {
 												alt='telegram'
 											/>
 										</div>
-										Написать Telegram
+										+7 (952) 446-62-33
 									</button>
 								</li>
 							</ul>
