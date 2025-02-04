@@ -20,7 +20,8 @@ export const metadata: Metadata = {
 		siteName: 'Laser Cutting'
 	},
 	other: {
-		'mailru-domain': 'CDKeRhuVgOCLl26y'
+		'mailru-domain': 'CDKeRhuVgOCLl26y',
+		'yandex-verification': 'dd60247d6e672066'
 	}
 }
 
