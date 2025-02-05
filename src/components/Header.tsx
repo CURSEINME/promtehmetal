@@ -39,7 +39,7 @@ const Header = () => {
 						</li>
 						<li className='flex items-center gap-5'>
 							<FaLocationDot className='h-5 w-5 text-[#ff1f1f]' />
-							<p className='text-red text-md'>г. Павлово, высокая 4</p>
+							<p className='text-red text-md'>г. Павлово ул. 3-я Северная улица, 7Б</p>
 						</li>
 					</ul>
 				</div>
