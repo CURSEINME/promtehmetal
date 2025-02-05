@@ -1,9 +1,8 @@
 'use client'
 
-import { useState } from 'react'
-import { Controller, useForm } from 'react-hook-form'
-import Input, { isValidPhoneNumber } from 'react-phone-number-input/input'
-import 'react-phone-number-input/style.css'
+import { isValidPhoneNumber } from 'libphonenumber-js'
+import { useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
 import Button from '../Button'
 
 interface IFormState {
@@ -16,10 +15,16 @@ const FeedbackForm = () => {
 	const {
 		register,
 		handleSubmit,
-
-		control,
+		setValue,
+		watch,
 		formState: { errors }
-	} = useForm<IFormState>()
+	} = useForm<IFormState>({
+		defaultValues: {
+			tel: '+7'
+		}
+	})
+
+	const tel = watch('tel')
 
 	const [message, setMessage] = useState<string>()
 	const [error, setError] = useState<string>()
@@ -46,6 +51,11 @@ const FeedbackForm = () => {
 		}
 	}
 
+	useEffect(() => {
+		if (!tel.startsWith('+7')) {
+			setValue('tel', '+7', { shouldValidate: true })
+		}
+	}, [tel])
 	return (
 		<form
 			className='flex flex-col items-center'
@@ -73,30 +83,26 @@ const FeedbackForm = () => {
 					</div>
 				</div>
 				<div className='flex items-center justify-between gap-10'>
-					<label className='mb-7 text-lg' htmlFor='tel-field'>
+					<label className='mb-7 text-lg' htmlFor='tel'>
 						Телефон
 					</label>
 					<div>
-						<Controller
-							name='tel'
-							control={control}
-							rules={{
-								required: 'Обязательное поле',
-								validate: value =>
-									isValidPhoneNumber(value) ? true : 'Неверный формат телефона'
-							}}
-							render={({ field: { onChange, value } }) => (
-								<Input
-									className={`w-[200px] border-4 ${errors.tel && 'border-red-500'} rounded-sm px-5 py-3 text-black focus:outline-none sm:w-[500px] lg:w-full`}
-									country='RU'
-									value={value}
-									withCountryCallingCode
-									international
-									onChange={onChange}
-									id='tel-field'
-								/>
-							)}
-						/>
+						<input
+							{...register('tel', {
+								validate: value => {
+									if (value === '+7') {
+										return 'Обязательное поле'
+									}
+									return isValidPhoneNumber(value)
+										? true
+										: 'Неверный формат телефона'
+								}
+							})}
+							className={`w-[200px] border-4 ${errors.tel && 'border-red-500'} rounded-sm px-5 py-3 text-black focus:outline-none sm:w-[500px] lg:w-full`}
+							type='tel'
+							autoComplete='on'
+							id='tel'
+						></input>
 						<div className='mt-2 h-[20px] text-sm font-bold text-red-500'>
 							{errors.tel?.message}
 						</div>
