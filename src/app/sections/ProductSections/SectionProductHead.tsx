@@ -25,7 +25,7 @@ const SectionProductHead = ({ product }: { product: IService }) => {
 	const { title, description, serviceImage } = product
 	return (
 		<div className='h-full w-full bg-homeOverlay lg:bg-none'>
-			<div className='container relative mx-auto mb-10 flex h-[600px] flex-col-reverse items-center justify-center gap-10 lg:mb-0 lg:grid lg:grid-cols-2'>
+			<div className='container relative mx-auto mb-20 flex h-[600px] flex-col-reverse items-center justify-center gap-10 lg:mb-0 lg:grid lg:grid-cols-2'>
 				<div className='flex flex-col'>
 					<h1 className='mb-8 text-3xl font-bold sm:text-5xl md:text-6xl lg:text-7xl'>
 						{title}
