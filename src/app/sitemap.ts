@@ -4,13 +4,20 @@ import { getServices } from '../../prisma/service'
 import { IService } from './sections/ProductSections/SectionProductHead'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-	const baseURL = 'https://www.example.com'
 	const res = await getServices()
 
-	return res.map((service: IService) => {
+	const services = res.map((service: IService) => {
 		return {
-			url: `${baseURL}/service/${service.slug}`,
+			url: `${process.env.NEXT_PUBLIC_BASE_URL}/service/${service.slug}`,
 			lastModified: new Date()
 		}
 	})
+
+	return [
+		{
+			url: `${process.env.NEXT_PUBLIC_BASE_URL}`,
+			lastModified: new Date()
+		},
+		...services
+	]
 }

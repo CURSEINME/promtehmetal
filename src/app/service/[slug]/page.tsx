@@ -31,6 +31,8 @@ export async function generateMetadata({ params }: { params: tParams }) {
 		title: service?.title,
 		description: service?.description,
 		openGraph: {
+			type: 'website',
+			siteName: 'промтехметалл',
 			title: service?.title,
 			description: service?.description
 		}

@@ -1,13 +1,12 @@
 import type { MetadataRoute } from 'next'
 
 export default function robots(): MetadataRoute.Robots {
-	const baseURL = 'https://www.example.com'
 	return {
 		rules: {
 			userAgent: '*',
-			allow: ['/', '/product'],
+			allow: ['/', '/service'],
 			disallow: []
 		},
-		sitemap: `${baseURL}/sitemap.xml`
+		sitemap: `${process.env.NEXT_PUBLIC_BASE_URL}/sitemap.xml`
 	}
 }
