@@ -3,6 +3,7 @@ import type { Metadata } from 'next'
 import dynamic from 'next/dynamic'
 import localFont from 'next/font/local'
 
+import YandexMetrika from '@/components/YandexMetrika'
 import './globals.css'
 
 const Footer = dynamic(() => import('../components/Footer'))
@@ -46,6 +47,7 @@ export default function RootLayout({
 			<body
 				className={`${geistSans.variable} ${geistMono.variable} antialiased`}
 			>
+				<YandexMetrika />
 				<ReactQueryProvider>
 					<div className='flex min-h-screen flex-col'>
 						<Header />
