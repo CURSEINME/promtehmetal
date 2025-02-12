@@ -15,9 +15,9 @@ const FlexLink = ({ children, offset, to, className }: FlexLinkProps) => {
 	const pathname = usePathname()
 	return (
 		<>
-			{pathname == '/' ? (
+			{pathname == '/' || (to !== 'services' && to !== 'about') ? (
 				<ScrollLink
-					href={`/#${to}`}
+					href={`#${to}`}
 					className={className}
 					to={to}
 					spy={true}

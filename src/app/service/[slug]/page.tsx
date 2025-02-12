@@ -88,7 +88,7 @@ function Advantages({ product }: { product: IService }) {
 
 async function OurWorks({ photos }: { photos: string[] }) {
 	return (
-		<section>
+		<section id='portfolio'>
 			<div className='container mx-auto mb-20'>
 				<div className='mb-10 flex items-center gap-5 md:mb-20'>
 					<FaGear className='h-10 w-10' />
