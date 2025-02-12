@@ -24,8 +24,8 @@ export interface IService {
 const SectionProductHead = ({ product }: { product: IService }) => {
 	const { title, description, serviceImage } = product
 	return (
-		<div className='h-full w-full bg-homeOverlay lg:bg-none'>
-			<div className='container relative mx-auto mb-20 flex h-[600px] flex-col-reverse items-center justify-center gap-10 lg:mb-0 lg:grid lg:grid-cols-2'>
+		<div className='relative mb-20 flex h-[600px] w-full bg-homeOverlay lg:mb-0 lg:bg-none'>
+			<div className='container mx-auto flex flex-col items-center justify-center lg:grid lg:grid-cols-2 lg:gap-10'>
 				<div className='flex flex-col'>
 					<h1 className='mb-8 text-3xl font-bold sm:text-5xl md:text-6xl lg:text-7xl'>
 						{title}
@@ -37,7 +37,7 @@ const SectionProductHead = ({ product }: { product: IService }) => {
 						</Button>
 					</FlexLink>
 				</div>
-				<div className='absolute h-full w-full md:mb-0 md:ml-auto lg:relative lg:h-[500px]'>
+				<div className='w-full md:mb-0 md:ml-auto lg:relative lg:h-[500px]'>
 					<Image
 						alt='laser cuttering banner'
 						fill
