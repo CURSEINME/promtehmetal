@@ -4,12 +4,19 @@ services:
     image: frontend
     build:
       context: .
+      dockerfile: Dockerfile
+      args:
+        - DATABASE_URL=${DATABASE_URL}
+        - ACCESS_KEY=${ACCESS_KEY}
+        - SECRET_ACCESS_KEY=${SECRET_ACCESS_KEY}
+        - REGION=${REGION}
+        - BUCKET_NAME=${BUCKET_NAME}
+        - ENDPOINT=${ENDPOINT}
+    env_file: .env
     ports:
       - '3000:3000'
     networks:
       - app
-    env_file:
-      - .env
   nginx:
     container_name: nginx
     image: nginx:alpine
