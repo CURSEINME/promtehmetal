@@ -4,8 +4,9 @@ import { isValidPhoneNumber } from 'libphonenumber-js'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import Button from '../Button'
+import { sendForm } from '@/app/actions/actions'
 
-interface IFormState {
+export interface IFormState {
 	name: string
 	tel: string
 	email: string
@@ -33,10 +34,7 @@ const FeedbackForm = () => {
 	async function onSubmit(data: IFormState) {
 		try {
 			setIsLoading(true)
-			const res = await fetch('/api/feedback', {
-				method: 'POST',
-				body: JSON.stringify(data)
-			})
+			const res = await sendForm({ data })
 
 			if (res.ok) {
 				setMessage('Ваша заявка отправлена')

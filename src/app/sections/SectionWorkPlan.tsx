@@ -1,5 +1,3 @@
-'use client'
-
 import Button from '@/components/Button'
 import FlexLink from '@/components/FlexLink'
 import { BsCreditCardFill } from 'react-icons/bs'

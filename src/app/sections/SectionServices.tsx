@@ -4,16 +4,10 @@ import dynamic from 'next/dynamic'
 import Image from 'next/image'
 import Link from 'next/link'
 import { FaGear } from 'react-icons/fa6'
-import { useQuery } from 'react-query'
 import { Element } from 'react-scroll'
 
 import { IService } from './ProductSections/SectionProductHead'
 
-export async function getServices() {
-	const res = await fetch(`/api/getServices`).then(res => res.json())
-
-	return res
-}
 function splitIntoSentences(text: string) {
 	if (!text) {
 		return []
@@ -23,10 +17,8 @@ function splitIntoSentences(text: string) {
 }
 
 const SlickSlider = dynamic(() => import('@/components/SlickSlider'))
-const SectionServices = () => {
-	const { data } = useQuery('products', () => getServices())
-
-	const productsList = data?.map((product: IService, index: number) => {
+const SectionServices = ({ products }: { products: IService[] }) => {
+	const productsList = products?.map((product: IService, index: number) => {
 		return (
 			<Link key={index} href={`/service/${product.slug}`}>
 				<div className={`mb-10`}>
