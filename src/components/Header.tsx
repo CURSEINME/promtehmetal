@@ -1,12 +1,20 @@
-'use server'
+'use client'
+
 import { FaPhone } from 'react-icons/fa'
 import { FaLocationDot } from 'react-icons/fa6'
 import { MdEmail } from 'react-icons/md'
-import { getServices } from '../../prisma/service'
+import { useQuery } from 'react-query'
 import HeaderNav from './HeaderNav'
 
-export default async function Header() {
-	const products = await getServices()
+export async function getServices() {
+	const res = await fetch('/api/getServices', { cache: 'force-cache' }).then(
+		res => res.json()
+	)
+	return res
+}
+
+export default function Header() {
+	const { data: services } = useQuery('services', () => getServices())
 
 	return (
 		<header className='right-0 top-0 z-10 w-full lg:sticky'>
@@ -30,7 +38,7 @@ export default async function Header() {
 					</ul>
 				</div>
 			</div>
-			<HeaderNav products={products} />
+			<HeaderNav services={services} />
 		</header>
 	)
 }

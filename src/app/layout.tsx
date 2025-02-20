@@ -1,30 +1,15 @@
+'use client'
+
 import ReactQueryProvider from '@/providers/ReactQueryProvider'
-import type { Metadata } from 'next'
 import dynamic from 'next/dynamic'
 import localFont from 'next/font/local'
 
 import YandexMetrika from '@/components/YandexMetrika'
+import { usePathname } from 'next/navigation'
 import './globals.css'
 
 const Footer = dynamic(() => import('../components/Footer'))
 const Header = dynamic(() => import('../components/Header'))
-
-export const metadata: Metadata = {
-	title: 'Услуги лазерной резки',
-	description:
-		'Полный цикл производства изделия на современном оборудовании. ✅ Лазерная резка, ✅ сварка и очистка металла, ✅ точная гибка на чпу станке, ✅ высокое качество порошковой покраски. Доставка на ваш склад по всей России.',
-	openGraph: {
-		type: 'website',
-		url: `${process.env.NEXT_PUBLIC_BASE_URL}`,
-		description:
-			'Полный цикл производства изделия на современном оборудовании. ✅ Лазерная резка, ✅ сварка и очистка металла, ✅ точная гибка на чпу станке, ✅ высокое качество порошковой покраски. Доставка на ваш склад по всей России.',
-		siteName: 'промтехметалл'
-	},
-	other: {
-		'mailru-domain': 'CDKeRhuVgOCLl26y',
-		'yandex-verification': 'dd60247d6e672066'
-	}
-}
 
 const geistSans = localFont({
 	src: './fonts/GeistVF.woff',
@@ -42,6 +27,8 @@ export default function RootLayout({
 }: Readonly<{
 	children: React.ReactNode
 }>) {
+	const pathname = usePathname()
+	const routes = ['/login', '/dashboard']
 	return (
 		<html lang='en'>
 			<body
@@ -50,9 +37,9 @@ export default function RootLayout({
 				<YandexMetrika />
 				<ReactQueryProvider>
 					<div className='flex min-h-screen flex-col'>
-						<Header />
+						{!routes.includes(pathname) && <Header />}
 						<main className=''>{children}</main>
-						<Footer />
+						{!routes.includes(pathname) && <Footer />}
 					</div>
 				</ReactQueryProvider>
 			</body>

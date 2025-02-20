@@ -1,10 +1,10 @@
 'use client'
 
+import { sendForm } from '@/actions/actions'
 import { isValidPhoneNumber } from 'libphonenumber-js'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import Button from '../Button'
-import { sendForm } from '@/app/actions/actions'
 
 export interface IFormState {
 	name: string

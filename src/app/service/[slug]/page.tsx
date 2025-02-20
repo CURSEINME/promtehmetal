@@ -13,7 +13,7 @@ import {
 	getService,
 	getServicePortfolio,
 	getServices
-} from '../../../../prisma/service'
+} from '@/actions/service'
 
 type tParams = Promise<{ slug: string }>
 
