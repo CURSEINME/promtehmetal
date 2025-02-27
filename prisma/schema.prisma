@@ -14,10 +14,7 @@ model services {
   slug           String
   title          String
   description    String
-  serviceFor     String
-  subDesc        String
   advantages     Advantages[]
-  productImage   String
   serviceImage   String
   serviceIcon    String
 }

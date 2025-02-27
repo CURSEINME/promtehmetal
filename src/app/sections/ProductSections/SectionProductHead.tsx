@@ -14,10 +14,7 @@ export interface IService {
 	title: string
 	slug: string
 	description: string
-	subDesc: string
-	serviceFor: string
 	advantages: IAdvantages[]
-	productImage: string
 	serviceIcon: string
 	serviceImage: string
 }

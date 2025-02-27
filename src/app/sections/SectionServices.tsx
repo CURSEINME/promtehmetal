@@ -40,12 +40,14 @@ const SectionServices = ({ products }: { products: IService[] }) => {
 					</div>
 				</div>
 				<div className={`relative h-[250px] w-full md:h-[350px]`}>
-					<Image
-						src={product?.serviceImage}
-						fill
-						className='rounded-lg object-cover'
-						alt='service'
-					/>
+					{product.serviceImage && (
+						<Image
+							src={product?.serviceImage}
+							fill
+							className='rounded-lg object-cover'
+							alt='service'
+						/>
+					)}
 				</div>
 			</Link>
 		)

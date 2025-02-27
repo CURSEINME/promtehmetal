@@ -1,13 +1,14 @@
 'use client'
+
+import { IService } from '@/app/sections/ProductSections/SectionProductHead'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useState } from 'react'
 import { SlArrowDown } from 'react-icons/sl'
 import Burger from './Burger'
 import FlexLink from './FlexLink'
-import { IService } from '@/app/sections/ProductSections/SectionProductHead'
 
-const HeaderNav = ({products}: {products: IService[]}) => {
+const HeaderNav = ({ services }: { services: IService[] }) => {
 	const [isDropMenuActive, setIsDropMenuActive] = useState(false)
 	const [isBurgerMenuActive, setIsBurgerMenuActive] = useState(false)
 	return (
@@ -57,9 +58,9 @@ const HeaderNav = ({products}: {products: IService[]}) => {
 								<ul
 									className={`${isDropMenuActive ? 'flex' : 'hidden'} absolute top-6 w-[300px] flex-col gap-2 rounded-b-lg border-t-0 bg-white p-4 text-black duration-200`}
 								>
-									{products?.map((service: IService) => (
+									{services?.map((service: IService) => (
 										<Link
-											key={service.slug}
+											key={service.id}
 											href={`/service/${service.slug}`}
 											className='text-lg underline'
 										>

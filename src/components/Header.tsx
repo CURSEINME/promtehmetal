@@ -7,8 +7,8 @@ import { useQuery } from 'react-query'
 import HeaderNav from './HeaderNav'
 
 export async function getServices() {
-	const res = await fetch('/api/getServices', { cache: 'force-cache' }).then(
-		res => res.json()
+	const res = await fetch('/api/getServices', { cache: 'force-cache' }).then(res =>
+		res.json()
 	)
 	return res
 }

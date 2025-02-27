@@ -10,7 +10,7 @@ const SlickSlider = dynamic(() => import('@/components/SlickSlider'))
 const SectionPortfolio = ({
 	portfolio
 }: {
-	portfolio?: string[] | undefined
+	portfolio?: string[]
 }) => {
 	const photos = portfolio?.map((photo: string, index: number) => {
 		return (
