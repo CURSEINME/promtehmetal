@@ -1,9 +1,13 @@
 'use server'
 
-import { ICreateServiceFormState } from '@/components/forms/CreateServiceForm'
-import { TUpdateServiceFormState } from '@/components/forms/UpdateServiceForm'
+import { auth } from '@/auth'
+import {
+	createServiceSchema,
+	TCreateServiceSchema
+} from '@/lib/createServiceSchema'
 import { getImageBuffer } from '@/lib/getImageBuffer'
 import { aws } from '@/lib/S3Client'
+import { TUpdateService, updateServiceSchema } from '@/lib/updateServiceSchema'
 import {
 	DeleteObjectCommand,
 	ListObjectsV2Command,
@@ -39,6 +43,12 @@ type TDeleteService = {
 
 export const deleteService = async (data: TDeleteService) => {
 	try {
+		const session = await auth()
+
+		if (!session) {
+			return { success: false, message: 'Вы не авторизованы' }
+		}
+
 		const { id, serviceImage, serviceIcon } = data
 
 		const deleteServiceImage = new DeleteObjectCommand({
@@ -50,7 +60,8 @@ export const deleteService = async (data: TDeleteService) => {
 			Key: `serviceIcons/${serviceIcon}`
 		})
 
-		await Promise.all([aws.send(deleteServiceImage), aws.send(deleteServiceIcon)])
+		aws.send(deleteServiceImage)
+		aws.send(deleteServiceIcon)
 
 		await prisma.services.delete({
 			where: {
@@ -59,29 +70,41 @@ export const deleteService = async (data: TDeleteService) => {
 		})
 
 		revalidatePath('/dashboard')
-		// revalidatePath('/')
+
+		return { success: true, message: 'Услуга удалена' }
 	} catch (err) {
-		console.log(err)
+		return { success: true, message: 'Произошла ошибка' }
 	}
 }
 
-type TUpdateService = TUpdateServiceFormState & {
+type TUpdateServiceAction = TUpdateService & {
 	id: string
 }
 
-export const updateService = async (data: TUpdateService) => {
+export const updateService = async (data: TUpdateServiceAction) => {
 	try {
+		const session = await auth()
+
+		if (!session) {
+			return { success: false, message: 'Вы не авторизованы' }
+		}
+
+		const result = updateServiceSchema.safeParse(data)
+
+		if (!result.success) {
+			return { success: false, message: 'Неверный формат данных' }
+		}
+
 		const {
-			id,
 			serviceImage,
 			serviceIcon,
 			oldServiceImage,
 			oldServiceIcon,
+			properties,
 			...newData
-		} = data
+		} = result.data
 
 		if (serviceImage instanceof File) {
-			console.log('test')
 			const serviceImageBuffer = getImageBuffer(serviceImage)
 
 			const serviceImageUpload = new PutObjectCommand({
@@ -91,17 +114,16 @@ export const updateService = async (data: TUpdateService) => {
 				ACL: 'public-read'
 			})
 
-			await aws.send(serviceImageUpload)
+			aws.send(serviceImageUpload)
 
 			const deleteServiceImage = new DeleteObjectCommand({
 				Bucket: bucketName,
 				Key: `serviceImages/${oldServiceImage.split('/')[5]}`
 			})
 
-			await aws.send(deleteServiceImage)
+			aws.send(deleteServiceImage)
 		}
 		if (serviceIcon instanceof File) {
-			console.log('test2')
 			const serviceIconBuffer = getImageBuffer(serviceIcon)
 
 			const serviceIconUpload = new PutObjectCommand({
@@ -111,14 +133,14 @@ export const updateService = async (data: TUpdateService) => {
 				ACL: 'public-read'
 			})
 
-			await aws.send(serviceIconUpload)
+			aws.send(serviceIconUpload)
 
 			const deleteServiceIcon = new DeleteObjectCommand({
 				Bucket: bucketName,
 				Key: `serviceImages/${oldServiceIcon.split('/')[5]}`
 			})
 
-			await aws.send(deleteServiceIcon)
+			aws.send(deleteServiceIcon)
 		}
 
 		await prisma.services.update({
@@ -127,6 +149,7 @@ export const updateService = async (data: TUpdateService) => {
 			},
 			data: {
 				...newData,
+				advantages: [...properties],
 				serviceImage: serviceImage
 					? `${endpoint}/${bucketName}/serviceImages/${serviceImage.name}`
 					: oldServiceImage,
@@ -137,34 +160,52 @@ export const updateService = async (data: TUpdateService) => {
 		})
 
 		revalidatePath('/dashboard')
-		// revalidatePath(`/service/test`)
-		// revalidatePath(`/`)
+
+		return { success: true, message: 'Услуга обновлена' }
 	} catch (err) {
 		console.log(err)
+		return { success: false, message: 'Произошла ошибка' }
 	}
 }
 
-export const createService = async (data: ICreateServiceFormState) => {
+export const createService = async (data: TCreateServiceSchema) => {
 	try {
-		const { title, slug, description, serviceIcon, serviceImage, properties } = data
+		const session = await auth()
+
+		if (!session) {
+			return { success: false, message: 'Вы не авторизованы' }
+		}
+
+		const result = createServiceSchema.safeParse(data)
+		if (!result.success) {
+			return { success: false, message: 'Неверный формат данных' }
+		}
+
+		const { title, slug, description, serviceIcon, serviceImage, properties } =
+			data
+
 		if (serviceImage instanceof File) {
 			const serviceImageBuffer = getImageBuffer(serviceImage)
+
 			const serviceImageUpload = new PutObjectCommand({
 				Bucket: bucketName,
 				Key: `serviceImages/` + serviceImage.name,
 				Body: await serviceImageBuffer,
 				ACL: 'public-read'
 			})
-			await aws.send(serviceImageUpload)
+
+			aws.send(serviceImageUpload)
 		}
 		if (serviceIcon instanceof File) {
 			const serviceIconBuffer = getImageBuffer(serviceIcon)
+
 			const serviceIconUpload = new PutObjectCommand({
 				Bucket: bucketName,
 				Key: 'serviceIcons/' + serviceIcon.name,
 				Body: await serviceIconBuffer,
 				ACL: 'public-read'
 			})
+
 			aws.send(serviceIconUpload)
 		}
 		await prisma.services.create({
@@ -181,11 +222,13 @@ export const createService = async (data: ICreateServiceFormState) => {
 					: ''
 			}
 		})
+
 		revalidatePath('/dashboard')
-		// revalidatePath('/')
+
 		return { success: true, message: 'Услуга успешно создана' }
 	} catch (error) {
-		return { success: false, message: error }
+		console.log(error)
+		return { success: false, message: 'Произошла ошибка' }
 	}
 }
 

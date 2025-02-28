@@ -2,40 +2,11 @@
 
 import { updateService } from '@/actions/service'
 import { IService } from '@/app/sections/ProductSections/SectionProductHead'
+import { TUpdateService, updateServiceSchema } from '@/lib/updateServiceSchema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import { Controller, useFieldArray, useForm } from 'react-hook-form'
-import z from 'zod'
-
-export type TUpdateServiceFormState = z.infer<typeof schema>
-
-const propertiesSchema = z.object({
-	title: z.string(),
-	description: z.string()
-})
-const schema = z.object({
-	title: z.string().min(1, 'Обязательное поле'),
-	slug: z.string().min(1, 'Обязательное поле'),
-	description: z.string().min(1, 'Обязательное поле'),
-	advantages: z.array(propertiesSchema),
-	oldServiceImage: z.string(),
-	oldServiceIcon: z.string(),
-	serviceImage: z
-		.any()
-		.refine(file => !file || (file && file instanceof File), 'Неверный формат файла')
-		.refine(
-			file => !file || file?.size < 4 * 1024 * 1024,
-			'Размер файла превышает 4 МБ'
-		),
-	serviceIcon: z
-		.any()
-		.refine(file => !file || (file && file instanceof File), 'Обязательное поле')
-		.refine(
-			file => !file || (file && file?.size < 4 * 1024 * 1024),
-			'Размер файла превышает 4 МБ'
-		)
-})
 
 const UpdateServiceForm = ({ service }: { service: IService }) => {
 	const {
@@ -44,14 +15,16 @@ const UpdateServiceForm = ({ service }: { service: IService }) => {
 		control,
 		resetField,
 		formState: { errors }
-	} = useForm<TUpdateServiceFormState>({
-		resolver: zodResolver(schema),
+	} = useForm<TUpdateService>({
+		mode: 'onChange',
+		resolver: zodResolver(updateServiceSchema),
 		defaultValues: {
 			...service,
 			oldServiceImage: service.serviceImage,
 			oldServiceIcon: service.serviceIcon,
 			serviceImage: null,
-			serviceIcon: null
+			serviceIcon: null,
+			properties: [...service.advantages]
 		}
 	})
 
@@ -60,14 +33,38 @@ const UpdateServiceForm = ({ service }: { service: IService }) => {
 		name: 'advantages'
 	})
 
-	const [previewServiceImage, setPreviewServiceImage] = useState<string | null>(null)
-	const [previewServiceIcon, setPreviewServiceIcon] = useState<string | null>(null)
+	const [previewServiceImage, setPreviewServiceImage] = useState<string | null>(
+		null
+	)
+	const [previewServiceIcon, setPreviewServiceIcon] = useState<string | null>(
+		null
+	)
 
 	const [fileInputKey, setFileInputKey] = useState('serviceImage')
 	const [file2InputKey, setFile2InputKey] = useState('serviceIcon')
 
-	const onSubmit = async (data: any) => {
-		await updateService({ ...data, id: service.id })
+	const [isLoading, setIsLoading] = useState<boolean>(false)
+
+	const [message, setMessage] = useState<string | null>()
+	const [errorMessage, setErrorMessage] = useState<string | null>()
+
+	const onSubmit = async (data: TUpdateService) => {
+		try {
+			setIsLoading(true)
+
+			const res = await updateService({ ...data, id: service.id })
+
+			if (res.success) {
+				setMessage(res.message)
+			}
+			if (!res.success) {
+				setErrorMessage(res.message)
+			}
+		} catch (err) {
+			setErrorMessage('Произошла ошибка')
+		} finally {
+			setIsLoading(false)
+		}
 	}
 	const handleRemoveServiceImage = () => {
 		URL.revokeObjectURL(previewServiceImage as string)
@@ -88,13 +85,16 @@ const UpdateServiceForm = ({ service }: { service: IService }) => {
 	}, [])
 
 	return (
-		<form className='flex flex-col gap-10' onSubmit={handleSubmit(onSubmit)}>
+		<form
+			className='flex flex-col items-center'
+			onSubmit={handleSubmit(onSubmit)}
+		>
 			<div className='flex gap-20'>
 				<div className='flex flex-col gap-10'>
 					<div>
 						<input
-							placeholder='title'
-							className={`rounded-lg bg-transparent p-2 text-lg text-white outline ${errors.title && 'outline outline-red-600 focus:outline-red-600'} focus:outline focus:outline-[3px] focus:outline-sky-500`}
+							placeholder='Заголовок услуги'
+							className={`rounded-lg bg-transparent p-2 text-lg text-white outline focus:outline-[3px] ${errors.title ? 'outline-red-600 focus:outline-red-600' : 'focus:outline-purple-500'}`}
 							type='text'
 							{...register('title')}
 						></input>
@@ -108,7 +108,7 @@ const UpdateServiceForm = ({ service }: { service: IService }) => {
 						<input
 							{...register('slug')}
 							placeholder='slug'
-							className={`rounded-lg bg-transparent p-2 text-lg text-white outline ${errors.slug && 'outline outline-red-600 focus:outline-red-600'} focus:outline focus:outline-[3px] focus:outline-sky-500`}
+							className={`rounded-lg bg-transparent p-2 text-lg text-white outline focus:outline-[3px] ${errors.slug ? 'outline-red-600 focus:outline-red-600' : 'focus:outline-purple-500'}`}
 							type='text'
 						></input>
 						<div className='h-0'>
@@ -120,7 +120,7 @@ const UpdateServiceForm = ({ service }: { service: IService }) => {
 					<div>
 						<textarea
 							placeholder='Описание услуги'
-							className={`h-[200px] w-[450px] rounded-lg bg-transparent p-2  text-sm text-white outline ${errors.description && 'outline outline-red-600 focus:outline-red-600'} focus:outline focus:outline-[3px] focus:outline-sky-500`}
+							className={`h-[200px] w-[450px] rounded-lg bg-transparent p-2 text-sm text-white outline focus:outline-[3px] ${errors.description ? 'outline-red-600 focus:outline-red-600' : 'focus:outline-purple-500'}`}
 							{...register('description')}
 						></textarea>
 						<div className='h-0'>
@@ -135,14 +135,23 @@ const UpdateServiceForm = ({ service }: { service: IService }) => {
 							control={control}
 							render={({ field, fieldState }) => (
 								<div className='flex flex-col'>
+									<label htmlFor='serviceImage' className='mb-2 text-lg'>
+										Изображение услуги
+									</label>
 									<input
+										id='serviceImage'
 										key={fileInputKey}
 										type='file'
 										accept='image/*'
 										onChange={event => {
 											if (event.target.files) {
 												field.onChange(event.target.files[0])
-												const imageUrl = URL.createObjectURL(event.target.files[0])
+												if (!event.target.files[0]) {
+													return setPreviewServiceImage(null)
+												}
+												const imageUrl = URL.createObjectURL(
+													event.target.files[0]
+												)
 												setPreviewServiceImage(imageUrl)
 											}
 										}}
@@ -154,7 +163,7 @@ const UpdateServiceForm = ({ service }: { service: IService }) => {
 							)}
 						/>
 						{previewServiceImage && (
-							<div className='relative h-[150] w-[150]'>
+							<div className='relative h-[125] w-[125]'>
 								<Image
 									src={previewServiceImage}
 									fill
@@ -177,14 +186,23 @@ const UpdateServiceForm = ({ service }: { service: IService }) => {
 							control={control}
 							render={({ field, fieldState }) => (
 								<div className='flex flex-col'>
+									<label htmlFor='serviceIcon' className='mb-2 text-lg'>
+										Иконка услуги
+									</label>
 									<input
+										id='serviceIcon'
 										key={file2InputKey}
 										type='file'
 										accept='image/*'
 										onChange={event => {
 											if (event.target.files) {
 												field.onChange(event.target.files[0])
-												const imageUrl = URL.createObjectURL(event.target.files[0])
+												if (!event.target.files[0]) {
+													return setPreviewServiceIcon(null)
+												}
+												const imageUrl = URL.createObjectURL(
+													event.target.files[0]
+												)
 												setPreviewServiceIcon(imageUrl)
 											}
 										}}
@@ -196,7 +214,7 @@ const UpdateServiceForm = ({ service }: { service: IService }) => {
 							)}
 						/>
 						{previewServiceIcon && (
-							<div className='relative h-[150] w-[150]'>
+							<div className='relative h-[125] w-[125]'>
 								<Image
 									src={previewServiceIcon}
 									fill
@@ -217,31 +235,57 @@ const UpdateServiceForm = ({ service }: { service: IService }) => {
 				<div className='flex flex-col items-center gap-10'>
 					{fields.map((property, index) => {
 						return (
-							<div key={property.id} className='flex flex-col gap-5'>
-								<input
-									{...register(`advantages.${index}.title`)}
-									placeholder='Заголовок'
-									className={`rounded-lg bg-transparent p-2 text-lg text-white outline ${errors.title && 'outline outline-red-600 focus:outline-red-600'} focus:outline focus:outline-[3px] focus:outline-sky-500`}
-								></input>
-								<input
-									{...register(`advantages.${index}.description`)}
-									placeholder='Описание'
-									className={`rounded-lg bg-transparent p-2 text-lg text-white outline ${errors.title && 'outline outline-red-600 focus:outline-red-600'} focus:outline focus:outline-[3px] focus:outline-sky-500`}
-								></input>
+							<div key={property.id} className='flex flex-col gap-10'>
+								<div>
+									<input
+										{...register(`properties.${index}.title`)}
+										placeholder='Заголовок'
+										className={`rounded-lg bg-transparent p-2 text-lg text-white outline focus:outline-[3px] ${errors.properties?.[index]?.title ? 'outline-red-600 focus:outline-red-600' : 'focus:outline-purple-500'}`}
+									></input>
+									<div className='h-0'>
+										<span className='text-sm font-bold text-red-600'>
+											{errors.properties?.[index]?.title?.message}
+										</span>
+									</div>
+								</div>
+								<div>
+									<input
+										{...register(`properties.${index}.description`)}
+										placeholder='Описание'
+										className={`rounded-lg bg-transparent p-2 text-lg text-white outline focus:outline-[3px] ${errors.properties?.[index]?.description ? 'outline-red-600 focus:outline-red-600' : 'focus:outline-purple-500'}`}
+									></input>
+									<div className='h-0'>
+										<span className='text-sm font-bold text-red-600'>
+											{errors.properties?.[index]?.description?.message}
+										</span>
+									</div>
+								</div>
 							</div>
 						)
 					})}
 					{fields.length < 4 && (
 						<button
+							className='rounded-lg border-2 border-white px-4 py-1 text-xl hover:bg-white hover:text-black'
 							type='button'
 							onClick={() => append({ title: '', description: '' })}
 						>
-							Добавить
+							Добавить свойство
 						</button>
 					)}
 				</div>
 			</div>
-			<button type='submit'>Submit</button>
+			<button
+				disabled={isLoading}
+				className='mt-10 self-center rounded-lg border-2 border-white px-4 py-1 text-xl hover:bg-white hover:text-black'
+				type='submit'
+			>
+				{isLoading ? 'Загрузка...' : 'Создать услугу'}
+			</button>
+			{message ? (
+				<div className='my-5 text-lg text-green-500'>{message}</div>
+			) : (
+				<div className='my-5 text-lg text-red-500'>{errorMessage}</div>
+			)}
 		</form>
 	)
 }

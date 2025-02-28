@@ -1,6 +1,6 @@
 import type { MetadataRoute } from 'next'
 
-import { getServices } from '../../prisma/service'
+import { getServices } from '../../actions/service'
 import { IService } from './sections/ProductSections/SectionProductHead'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {

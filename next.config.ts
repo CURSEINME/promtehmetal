@@ -9,6 +9,11 @@ const nextConfig = {
 				hostname: 'storage.yandexcloud.net'
 			}
 		]
+	},
+	experimental: {
+		serverActions: {
+			bodySizeLimit: '10mb'
+		}
 	}
 }
 
