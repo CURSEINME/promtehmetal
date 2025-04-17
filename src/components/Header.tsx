@@ -1,21 +1,23 @@
 'use client'
 
+import { IService } from '@/app/sections/ProductSections/SectionProductHead'
+import { useEffect, useState } from 'react'
 import { FaPhone } from 'react-icons/fa'
 import { FaLocationDot } from 'react-icons/fa6'
 import { MdEmail } from 'react-icons/md'
-import { useQuery } from 'react-query'
 import HeaderNav from './HeaderNav'
-
-export async function getServices() {
-	const res = await fetch('/api/getServices', { cache: 'force-cache' }).then(res =>
-		res.json()
-	)
-	return res
-}
+import { getServices } from '@/actions/service'
 
 export default function Header() {
-	const { data: services } = useQuery('services', () => getServices())
+	const [services, setServices] = useState<IService[] | null>(null)
 
+	useEffect(() => {
+		const fetchServices = async () => {
+			const res = await getServices()
+			setServices(res)
+		}
+		fetchServices()
+	}, [])
 	return (
 		<header className='right-0 top-0 z-10 w-full lg:sticky'>
 			<div className='hidden w-full bg-black py-4 lg:flex'>

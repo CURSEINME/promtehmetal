@@ -8,7 +8,7 @@ import { SlArrowDown } from 'react-icons/sl'
 import Burger from './Burger'
 import FlexLink from './FlexLink'
 
-const HeaderNav = ({ services }: { services: IService[] }) => {
+const HeaderNav = ({ services }: { services: IService[] | null }) => {
 	const [isDropMenuActive, setIsDropMenuActive] = useState(false)
 	const [isBurgerMenuActive, setIsBurgerMenuActive] = useState(false)
 	return (

@@ -34,7 +34,7 @@ const SectionServices = ({ products }: { products: IService[] }) => {
 						<h1 className='my-2 text-xl font-bold md:text-2xl'>
 							{product.title}
 						</h1>
-						<p className='mb-auto line-clamp-2 max-h-[50px] overflow-hidden overflow-ellipsis text-lg md:text-xl'>
+						<p className='mb-auto line-clamp-2 h-[50px] overflow-hidden overflow-ellipsis text-lg md:text-xl'>
 							{splitIntoSentences(product.description)[0]}
 						</p>
 					</div>
