@@ -1,10 +1,8 @@
 'use server'
 
 import { auth } from '@/auth'
-import {
-	createServiceSchema,
-	TCreateServiceSchema
-} from '@/lib/createServiceSchema'
+import { createServiceSchema, TCreateServiceSchema } from '@/lib/createServiceSchema'
+import { generateSlug } from '@/lib/generateSlug'
 import { getImageBuffer } from '@/lib/getImageBuffer'
 import { aws } from '@/lib/S3Client'
 import { TUpdateService, updateServiceSchema } from '@/lib/updateServiceSchema'
@@ -15,6 +13,7 @@ import {
 } from '@aws-sdk/client-s3'
 import { PrismaClient } from '@prisma/client'
 import { revalidatePath } from 'next/cache'
+import { z } from 'zod'
 
 const prisma = new PrismaClient()
 
@@ -35,11 +34,12 @@ export const getService = async (slug: string) => {
 	return res
 }
 
-type TDeleteService = {
-	id: string
-	serviceImage: string
-	serviceIcon: string
-}
+const deleteServiceSchema = z.object({
+	id: z.string(),
+	serviceImage: z.string(),
+	serviceIcon: z.string()
+})
+type TDeleteService = z.infer<typeof deleteServiceSchema>
 
 export const deleteService = async (data: TDeleteService) => {
 	try {
@@ -49,7 +49,13 @@ export const deleteService = async (data: TDeleteService) => {
 			return { success: false, message: 'Вы не авторизованы' }
 		}
 
-		const { id, serviceImage, serviceIcon } = data
+		const result = deleteServiceSchema.safeParse(data)
+
+		if (!result.success) {
+			return { success: false, message: 'Неверный формат данных' }
+		}
+
+		const { id, serviceImage, serviceIcon } = result.data
 
 		const deleteServiceImage = new DeleteObjectCommand({
 			Bucket: bucketName,
@@ -69,10 +75,12 @@ export const deleteService = async (data: TDeleteService) => {
 			}
 		})
 
-		revalidatePath('/dashboard')
+		revalidatePath('/admin')
+		revalidatePath('/')
 
 		return { success: true, message: 'Услуга удалена' }
 	} catch (err) {
+		console.log(err)
 		return { success: true, message: 'Произошла ошибка' }
 	}
 }
@@ -143,12 +151,15 @@ export const updateService = async (data: TUpdateServiceAction) => {
 			aws.send(deleteServiceIcon)
 		}
 
+		const slug = generateSlug(data.title)
+
 		await prisma.services.update({
 			where: {
 				id: data.id
 			},
 			data: {
 				...newData,
+				slug,
 				advantages: [...properties],
 				serviceImage: serviceImage
 					? `${endpoint}/${bucketName}/serviceImages/${serviceImage.name}`
@@ -159,7 +170,9 @@ export const updateService = async (data: TUpdateServiceAction) => {
 			}
 		})
 
-		revalidatePath('/dashboard')
+		revalidatePath('/admin')
+		revalidatePath('/')
+		revalidatePath(`/service/${slug}`)
 
 		return { success: true, message: 'Услуга обновлена' }
 	} catch (err) {
@@ -181,8 +194,7 @@ export const createService = async (data: TCreateServiceSchema) => {
 			return { success: false, message: 'Неверный формат данных' }
 		}
 
-		const { title, slug, description, serviceIcon, serviceImage, properties } =
-			data
+		const { title, description, serviceIcon, serviceImage, properties } = data
 
 		if (serviceImage instanceof File) {
 			const serviceImageBuffer = getImageBuffer(serviceImage)
@@ -208,6 +220,8 @@ export const createService = async (data: TCreateServiceSchema) => {
 
 			aws.send(serviceIconUpload)
 		}
+		const slug = generateSlug(title)
+
 		await prisma.services.create({
 			data: {
 				title,
@@ -223,7 +237,8 @@ export const createService = async (data: TCreateServiceSchema) => {
 			}
 		})
 
-		revalidatePath('/dashboard')
+		revalidatePath('/admin')
+		revalidatePath('/')
 
 		return { success: true, message: 'Услуга успешно создана' }
 	} catch (error) {

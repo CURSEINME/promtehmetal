@@ -7,7 +7,7 @@ import ServiceList from '@/components/ServiceList'
 export default async function Dashboard() {
 	const services = await getServices()
 	return (
-		<div className='flex h-screen flex-col items-center justify-center gap-10'>
+		<div className='flex py-10 flex-col items-center justify-center gap-10'>
 			<ServiceList services={services} />
 			<AddServiceBtn />
 		</div>

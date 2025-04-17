@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server'
 
 export default middleware(async req => {
 	const isLoggedIn = !!req.auth
-	const protectedRoute = req.nextUrl.pathname.startsWith('/dashboard')
+	const protectedRoute = req.nextUrl.pathname.startsWith('/admin')
 	const authRoute = req.nextUrl.pathname.startsWith('/login')
 
 	if (protectedRoute && !isLoggedIn) {
@@ -11,7 +11,7 @@ export default middleware(async req => {
 	}
 
 	if (authRoute && isLoggedIn) {
-		return NextResponse.redirect(new URL('/dashboard', req.url))
+		return NextResponse.redirect(new URL('/admin', req.url))
 	}
 
 	return NextResponse.next()

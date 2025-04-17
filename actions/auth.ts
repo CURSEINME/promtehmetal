@@ -12,7 +12,7 @@ export async function signInWithCredentials(data: {
 		await signIn('credentials', {
 			name,
 			password,
-			redirectTo: '/dashboard'
+			redirectTo: '/admin'
 		})
 	} catch (error) {
 		if (error instanceof AuthError) {
