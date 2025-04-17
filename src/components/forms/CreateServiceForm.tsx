@@ -1,10 +1,7 @@
 'use client'
 
 import { createService } from '@/actions/service'
-import {
-	createServiceSchema,
-	TCreateServiceSchema
-} from '@/lib/createServiceSchema'
+import { createServiceSchema, TCreateServiceSchema } from '@/lib/createServiceSchema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import Image from 'next/image'
 import { useState } from 'react'
@@ -22,17 +19,13 @@ const CreateServiceForm = () => {
 		resolver: zodResolver(createServiceSchema)
 	})
 
-	const { fields, append } = useFieldArray({
+	const { fields, append, remove } = useFieldArray({
 		control,
 		name: 'properties'
 	})
 
-	const [previewServiceImage, setPreviewServiceImage] = useState<string | null>(
-		null
-	)
-	const [previewServiceIcon, setPreviewServiceIcon] = useState<string | null>(
-		null
-	)
+	const [previewServiceImage, setPreviewServiceImage] = useState<string | null>(null)
+	const [previewServiceIcon, setPreviewServiceIcon] = useState<string | null>(null)
 
 	const [fileInputKey, setFileInputKey] = useState('serviceImage')
 	const [file2InputKey, setFile2InputKey] = useState('serviceIcon')
@@ -54,6 +47,7 @@ const CreateServiceForm = () => {
 				setErrorMessage(res.message)
 			}
 		} catch (err) {
+			console.log(err)
 			setErrorMessage('Произошла ошибка')
 		} finally {
 			setIsLoading(false)
@@ -72,10 +66,7 @@ const CreateServiceForm = () => {
 		setPreviewServiceIcon(null)
 	}
 	return (
-		<form
-			className='flex flex-col items-center'
-			onSubmit={handleSubmit(onSubmit)}
-		>
+		<form className='flex flex-col items-center' onSubmit={handleSubmit(onSubmit)}>
 			<div className='flex gap-20'>
 				<div className='flex flex-col gap-10'>
 					<div>
@@ -88,19 +79,6 @@ const CreateServiceForm = () => {
 						<div className='h-0'>
 							<span className='text-sm font-bold text-red-600'>
 								{errors.title?.message}
-							</span>
-						</div>
-					</div>
-					<div>
-						<input
-							{...register('slug')}
-							placeholder='slug'
-							className={`rounded-lg bg-transparent p-2 text-lg text-white outline focus:outline-[3px] ${errors.slug ? 'outline-red-600 focus:outline-red-600' : 'focus:outline-purple-500'}`}
-							type='text'
-						></input>
-						<div className='h-0'>
-							<span className='text-sm font-bold text-red-600'>
-								{errors.slug?.message}
 							</span>
 						</div>
 					</div>
@@ -136,9 +114,7 @@ const CreateServiceForm = () => {
 												if (!event.target.files[0]) {
 													return setPreviewServiceImage(null)
 												}
-												const imageUrl = URL.createObjectURL(
-													event.target.files[0]
-												)
+												const imageUrl = URL.createObjectURL(event.target.files[0])
 												setPreviewServiceImage(imageUrl)
 											}
 										}}
@@ -150,16 +126,16 @@ const CreateServiceForm = () => {
 							)}
 						/>
 						{previewServiceImage && (
-							<div className='relative h-[125] w-[125]'>
-								<Image
+							<div className='relative h-[125px] w-[125px]'>
+								<img
+									loading='lazy'
 									src={previewServiceImage}
-									fill
 									alt='preview'
-									className='rounded-lg object-cover'
+									className='h-full w-full rounded-lg object-cover'
 								/>
 								<button
 									onClick={handleRemoveServiceImage}
-									className='absolute right-2 top-2 dark:invert'
+									className='absolute -right-6 -top-6'
 									type='submit'
 								>
 									<Image src='/close.svg' width={25} height={25} alt='close' />
@@ -187,9 +163,7 @@ const CreateServiceForm = () => {
 												if (!event.target.files[0]) {
 													return setPreviewServiceIcon(null)
 												}
-												const imageUrl = URL.createObjectURL(
-													event.target.files[0]
-												)
+												const imageUrl = URL.createObjectURL(event.target.files[0])
 												setPreviewServiceIcon(imageUrl)
 											}
 										}}
@@ -201,16 +175,16 @@ const CreateServiceForm = () => {
 							)}
 						/>
 						{previewServiceIcon && (
-							<div className='relative h-[125] w-[125]'>
-								<Image
+							<div className='relative h-[125px] w-[125px]'>
+								<img
+									loading='lazy'
 									src={previewServiceIcon}
-									fill
 									alt='preview'
 									className='rounded-lg object-cover'
 								/>
 								<button
 									onClick={handleRemoveServiceIcon}
-									className='absolute right-2 top-2 dark:invert'
+									className='absolute -right-6 -top-6'
 									type='submit'
 								>
 									<Image src='/close.svg' width={25} height={25} alt='close' />
@@ -222,7 +196,7 @@ const CreateServiceForm = () => {
 				<div className='flex flex-col items-center gap-10'>
 					{fields.map((property, index) => {
 						return (
-							<div key={property.id} className='flex flex-col gap-10'>
+							<div key={property.id} className='flex flex-col gap-5'>
 								<div>
 									<input
 										{...register(`properties.${index}.title`)}
@@ -250,15 +224,26 @@ const CreateServiceForm = () => {
 							</div>
 						)
 					})}
-					{fields.length < 4 && (
-						<button
-							className='rounded-lg border-2 border-white px-4 py-1 text-xl hover:bg-white hover:text-black'
-							type='button'
-							onClick={() => append({ title: '', description: '' })}
-						>
-							Добавить свойство
-						</button>
-					)}
+					<div className='flex flex-col gap-5'>
+						{fields.length < 4 && (
+							<button
+								className='rounded-lg border-2 border-white px-4 py-1 text-xl hover:bg-white hover:text-black'
+								type='button'
+								onClick={() => append({ title: '', description: '' })}
+							>
+								Добавить свойство
+							</button>
+						)}
+						{fields.length > 0 && (
+							<button
+								className='rounded-lg border-2 border-white px-4 py-1 text-xl hover:bg-white hover:text-black'
+								type='button'
+								onClick={() => remove(fields.length - 1)}
+							>
+								Удалить свойство
+							</button>
+						)}
+					</div>
 				</div>
 			</div>
 			<button

@@ -13,8 +13,16 @@ const ServiceList = ({ services }: { services: IService[] }) => {
 	const [selectedService, setSelectedService] = useState<IService | null>(null)
 
 	const serviceList = services.map((service: IService) => {
-		const serviceImage = service.serviceImage.split('/')[5]
-		const serviceIcon = service.serviceIcon.split('/')[5]
+		const serviceImage = service.serviceImage.split('/')[5] || ''
+		const serviceIcon = service.serviceIcon.split('/')[5] || ''
+
+		const handleDelete = () => {
+			const result = confirm('Вы действительно хотите удалить услугу?')
+			
+			if (result) {
+				deleteService({ serviceImage, serviceIcon, id: service.id })
+			}
+		}
 
 		return (
 			<div
@@ -32,12 +40,7 @@ const ServiceList = ({ services }: { services: IService[] }) => {
 					>
 						<MdEdit className='h-7 w-7' />
 					</button>
-					<button
-						onClick={() =>
-							deleteService({ serviceImage, serviceIcon, id: service.id })
-						}
-						className='text-lg'
-					>
+					<button onClick={() => handleDelete()} className='text-lg'>
 						<TiDeleteOutline className='h-7 w-7' />
 					</button>
 				</div>
